@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useMousePosition } from './hooks/useMousePosition';
 import PaperGrain from './components/PaperGrain';
 import Navbar from './components/Navbar';
 import HeroSection from './components/HeroSection';
@@ -14,8 +13,6 @@ import ContactSection from './components/ContactSection';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
-  const mousePosition = useMousePosition();
-
   useEffect(() => {
     // Set up smooth scrolling so page movement feels fluid
     const lenis = new Lenis({
@@ -112,11 +109,11 @@ export default function App() {
 
       {/* Main page sections */}
       <main>
-        <HeroSection mousePosition={mousePosition} />
+        <HeroSection />
         <JourneySection />
         <ProjectsSection />
         <EngineeringToolbox />
-        <ContactSection mousePosition={mousePosition} />
+        <ContactSection />
       </main>
     </div>
   );

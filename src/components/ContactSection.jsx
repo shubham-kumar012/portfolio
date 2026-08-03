@@ -34,7 +34,7 @@ const LETTER_PARAGRAPHS = [
   { id: 'p6', type: 'signoff', text: '— Shubham Kumar' },
 ];
 
-export default function ContactSection({ mousePosition }) {
+export default function ContactSection() {
   const [isOpened, setIsOpened] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [activeRipple, setActiveRipple] = useState(null);
@@ -58,9 +58,6 @@ export default function ContactSection({ mousePosition }) {
   const drawerRef = useRef(null);
   const capsulesRef = useRef([]);
   const hasStartedTyping = useRef(false);
-
-  // Normalized mouse coordinates for subtle parallax tilt
-  const { normalizedX = 0, normalizedY = 0 } = mousePosition || {};
 
   // Kinetic live writing sequence (preserves full letter layout, reveals character-by-character)
   const startRealtimeWriting = () => {
@@ -184,21 +181,6 @@ export default function ContactSection({ mousePosition }) {
 
     return () => ctx.revert();
   }, []);
-
-  // Handle subtle 3D tilt tracking for letter card (max 3 degrees)
-  useEffect(() => {
-    if (!letterRef.current || isOpened) return;
-    const tiltX = normalizedY * -3;
-    const tiltY = normalizedX * 3;
-
-    gsap.to(letterRef.current, {
-      rotateX: tiltX,
-      rotateY: tiltY,
-      transformPerspective: 1000,
-      duration: 0.6,
-      ease: 'power2.out',
-    });
-  }, [normalizedX, normalizedY, isOpened]);
 
   // Handle capsule individual subtle 3D tilt on mousemove
   const handleCapsuleMouseMove = (e, index) => {

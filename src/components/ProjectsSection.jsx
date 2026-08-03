@@ -127,7 +127,6 @@ export default function ProjectsSection() {
   const [activeBgTint, setActiveBgTint] = useState('transparent');
   const [isArchiveExpanded, setIsArchiveExpanded] = useState(false);
   const [isSectionVisible, setIsSectionVisible] = useState(false);
-  const [cardTilts, setCardTilts] = useState({});
 
   // 1. ScrollTrigger setup for Focus Mode & 70% viewport active state
   useEffect(() => {
@@ -230,38 +229,58 @@ export default function ProjectsSection() {
     }
   };
 
-  // 3. Card mouse tilt & 2-3px video shift interaction
+  // 3. Direct GSAP card mouse tilt & 2-3px video shift (zero React re-renders)
   const handleMouseMove = (e, index) => {
     const card = e.currentTarget;
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
 
-    // Slight 3D tilt angles (max ~2.5 deg)
     const rotateX = (-y / (rect.height / 2)) * 2.5;
     const rotateY = (x / (rect.width / 2)) * 2.5;
-
-    // 2-3px subtle shift for inner elements
     const shiftX = (x / (rect.width / 2)) * 3;
     const shiftY = (y / (rect.height / 2)) * 3;
 
-    setCardTilts((prev) => ({
-      ...prev,
-      [index]: {
-        transform: `perspective(1000px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) scale3d(1.015, 1.015, 1.015)`,
-        innerShift: `translate3d(${shiftX.toFixed(1)}px, ${shiftY.toFixed(1)}px, 0)`,
-      },
-    }));
+    gsap.to(card, {
+      rotateX,
+      rotateY,
+      transformPerspective: 1000,
+      scale: 1.015,
+      duration: 0.25,
+      ease: 'power2.out',
+    });
+
+    const videoEl = videoRefs.current[index];
+    if (videoEl) {
+      gsap.to(videoEl, {
+        x: shiftX,
+        y: shiftY,
+        duration: 0.25,
+        ease: 'power2.out',
+      });
+    }
   };
 
   const handleMouseLeave = (index) => {
-    setCardTilts((prev) => ({
-      ...prev,
-      [index]: {
-        transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
-        innerShift: 'translate3d(0, 0, 0)',
-      },
-    }));
+    const card = cardRefs.current[index];
+    if (card) {
+      gsap.to(card, {
+        rotateX: 0,
+        rotateY: 0,
+        scale: 1,
+        duration: 0.4,
+        ease: 'power2.out',
+      });
+    }
+    const videoEl = videoRefs.current[index];
+    if (videoEl) {
+      gsap.to(videoEl, {
+        x: 0,
+        y: 0,
+        duration: 0.4,
+        ease: 'power2.out',
+      });
+    }
   };
 
   // Scroll smoothly to a specific project from progress indicator
@@ -360,10 +379,6 @@ export default function ProjectsSection() {
       <div ref={cardsContainerRef} className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 space-y-16 sm:space-y-24 md:space-y-28">
         {FEATURED_PROJECTS.map((project, idx) => {
           const isActive = idx === activeIndex;
-          const tiltState = cardTilts[idx] || {
-            transform: 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)',
-            innerShift: 'translate3d(0, 0, 0)',
-          };
 
           return (
             <div
@@ -376,8 +391,7 @@ export default function ProjectsSection() {
                 onMouseMove={(e) => handleMouseMove(e, idx)}
                 onMouseLeave={() => handleMouseLeave(idx)}
                 style={{
-                  transform: tiltState.transform,
-                  transition: 'transform 0.25s cubic-bezier(0.1, 0.8, 0.2, 1), box-shadow 0.5s ease, background-color 0.5s ease, border-color 0.5s ease',
+                  transition: 'box-shadow 0.5s ease, background-color 0.5s ease, border-color 0.5s ease',
                 }}
                 className={`group relative w-full rounded-2xl sm:rounded-3xl p-5 sm:p-7 border transition-all duration-500 overflow-hidden ${
                   isActive
@@ -388,7 +402,6 @@ export default function ProjectsSection() {
                 {/* VIDEO EXHIBITION FRAME (Sleek Widescreen Ratio & Height Cap) */}
                 <div
                   className="relative w-full aspect-[21/10] sm:aspect-[16/9] max-h-[340px] sm:max-h-[380px] rounded-xl sm:rounded-2xl overflow-hidden bg-[#171717] mb-5 sm:mb-6 border border-[#171717]/10 shadow-md group/video cursor-pointer"
-                  data-cursor="card"
                 >
                   <video
                     ref={(el) => (videoRefs.current[idx] = el)}
@@ -399,7 +412,6 @@ export default function ProjectsSection() {
                     playsInline
                     preload="metadata"
                     className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover/video:scale-[1.03]"
-                    style={{ transform: tiltState.innerShift }}
                   />
 
                   {/* Subtle video ambient overlay gradient */}

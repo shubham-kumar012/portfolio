@@ -4,14 +4,51 @@ import { HiArrowRight, HiArrowUpRight } from 'react-icons/hi2';
 import Magnetic from './Magnetic';
 import profileImg from '../assets/profile.png';
 
-export default function HeroSection({ mousePosition }) {
+export default function HeroSection() {
   const heroRef = useRef(null);
   const bgTypographyRef = useRef(null);
   const portraitRef = useRef(null);
+  const portraitGlowRef = useRef(null);
   const cardsRef = useRef([]);
-  
-    const { normalizedX = 0, normalizedY = 0, x = 0, y = 0 } = mousePosition || {};
-  
+
+  useEffect(() => {
+    if (!bgTypographyRef.current || !portraitRef.current) return;
+
+    // Smooth hardware-accelerated mouse interpolation with zero React re-renders
+    const bgTextX = gsap.quickTo(bgTypographyRef.current, 'x', { duration: 0.7, ease: 'power3.out' });
+    const bgTextY = gsap.quickTo(bgTypographyRef.current, 'y', { duration: 0.7, ease: 'power3.out' });
+    const portraitX = gsap.quickTo(portraitRef.current, 'x', { duration: 0.5, ease: 'power3.out' });
+    const portraitY = gsap.quickTo(portraitRef.current, 'y', { duration: 0.5, ease: 'power3.out' });
+    const glowX = portraitGlowRef.current ? gsap.quickTo(portraitGlowRef.current, 'x', { duration: 0.5, ease: 'power3.out' }) : null;
+    const glowY = portraitGlowRef.current ? gsap.quickTo(portraitGlowRef.current, 'y', { duration: 0.5, ease: 'power3.out' }) : null;
+
+    const handleMouseMove = (e) => {
+      const { clientX, clientY } = e;
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+
+      // Update CSS variables directly for spotlight glow background
+      document.documentElement.style.setProperty('--mouse-x', `${clientX}px`);
+      document.documentElement.style.setProperty('--mouse-y', `${clientY}px`);
+
+      // Normalized -1 to +1 range
+      const normX = (clientX / windowWidth) * 2 - 1;
+      const normY = (clientY / windowHeight) * 2 - 1;
+
+      bgTextX(normX * -15);
+      bgTextY(normY * -10);
+      portraitX(normX * 18);
+      portraitY(normY * 12);
+      if (glowX && glowY) {
+        glowX(normX * 30);
+        glowY(normY * 20);
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   // Subtle 3D tilt effect on card hover based on cursor position
   const handleCardMouseMove = (e, index) => {
     const card = cardsRef.current[index];
@@ -64,13 +101,10 @@ export default function HeroSection({ mousePosition }) {
       {/* Main hero container */}
       <div className="relative w-full max-w-7xl flex-1 flex flex-col justify-center items-center my-auto">
 
-        {/* Big background typography that responds slightly to cursor movement */}
+        {/* Big background typography */}
         <div
           ref={bgTypographyRef}
-          style={{
-            transform: `translate3d(${normalizedX * -15}px, ${normalizedY * -10}px, 0)`,
-          }}
-          className="absolute inset-0 flex flex-col justify-start items-center pointer-events-none z-0 transition-transform duration-700 ease-out leading-none"
+          className="absolute inset-0 flex flex-col justify-start items-center pointer-events-none z-0 leading-none"
         >
           <h1
             id="hero-bg-text-1"
@@ -86,20 +120,15 @@ export default function HeroSection({ mousePosition }) {
           </h1>
         </div>
 
-        {/* Centered profile image with parallax tilt */}
+        {/* Centered profile image */}
         <div
           ref={portraitRef}
-          style={{
-            transform: `translate3d(${normalizedX * 18}px, ${normalizedY * 12}px, 0)`,
-          }}
-          className="relative z-10 flex justify-center items-end h-[55vh] sm:h-[62vh] md:h-[68vh] lg:h-[60vh] w-full max-w-xl transition-transform duration-500 ease-out"
+          className="relative z-10 flex justify-center items-end h-[55vh] sm:h-[62vh] md:h-[68vh] lg:h-[60vh] w-full max-w-xl"
         >
           {/* Warm ambient glow tracking behind portrait */}
           <div
-            className="absolute bottom-6 w-72 h-72 rounded-full bg-[#6F5A43]/15 blur-3xl transition-opacity duration-500 pointer-events-none"
-            style={{
-              transform: `translate(${normalizedX * 30}px, ${normalizedY * 20}px)`,
-            }}
+            ref={portraitGlowRef}
+            className="absolute bottom-6 w-72 h-72 rounded-full bg-[#6F5A43]/15 blur-3xl pointer-events-none"
           />
 
           <img
@@ -107,7 +136,6 @@ export default function HeroSection({ mousePosition }) {
             alt="Shubham - Full Stack Developer"
             id="hero-portrait"
             className="relative h-full object-contain filter drop-shadow-[0_25px_35px_rgba(23,23,23,0.18)] transition-all duration-300 pointer-events-auto"
-            data-cursor="card"
           />
         </div>
 
