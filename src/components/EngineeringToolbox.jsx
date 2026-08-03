@@ -308,7 +308,7 @@ export default function EngineeringToolbox() {
     <section
       ref={sectionRef}
       id="toolbox"
-      className="relative w-full py-28 md:py-36 bg-[#F6F2EC] text-[#171717] overflow-hidden selection:bg-[#6F5A43] selection:text-[#F6F2EC]"
+      className="relative w-full pt-28 md:pt-36 pb-6 md:pb-10 bg-[#F6F2EC] text-[#171717] overflow-hidden selection:bg-[#6F5A43] selection:text-[#F6F2EC]"
     >
       {/* Huge Background Transparent Editorial Typography: TOOLBOX */}
       <div className="absolute top-12 left-0 w-full flex justify-center pointer-events-none z-0 overflow-hidden leading-none select-none opacity-[0.25]">

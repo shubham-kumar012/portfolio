@@ -356,7 +356,7 @@ export default function ContactSection() {
     <section
       ref={sectionRef}
       id="contact"
-      className={`relative min-h-screen w-full py-28 sm:py-36 lg:py-44 px-4 sm:px-8 flex flex-col items-center justify-center text-center transition-colors duration-1000 ease-in-out ${isOpened ? 'bg-[#EFEAE2]' : 'bg-[#F6F2EC]'
+      className={`relative min-h-screen w-full pt-28 sm:pt-36 lg:pt-44 pb-8 sm:pb-12 px-4 sm:px-8 flex flex-col items-center justify-center text-center transition-colors duration-1000 ease-in-out ${isOpened ? 'bg-[#EFEAE2]' : 'bg-[#F6F2EC]'
         }`}
     >
       {/* Paper grain background texture overlay */}
@@ -399,7 +399,7 @@ export default function ContactSection() {
           {/* Subtle paper watermark indicator in top right */}
           <div className="absolute top-6 right-8 text-[10px] sm:text-xs font-mono uppercase tracking-widest text-[#6F5A43]/50 pointer-events-none select-none flex items-center gap-1.5">
             <span className="h-1.5 w-1.5 rounded-full bg-[#6F5A43]/50" />
-            <span>Nº 01 • INVITATION</span>
+            <span>INVITATION</span>
           </div>
 
           {/* Letter Body Content in Kinetic "Edu TAS Beginner" Handwriting */}
@@ -418,7 +418,7 @@ export default function ContactSection() {
                 return (
                   <p
                     key={para.id}
-                    className="text-2xl sm:text-3xl text-[#1E1A17] font-bold tracking-wide"
+                    className="text-2xl sm:text-3xl text-[#1E1A17] font-semibold tracking-wide"
                   >
                     <span>{visibleText}</span>
                     {isActive && (
@@ -435,7 +435,7 @@ export default function ContactSection() {
                 return (
                   <p
                     key={para.id}
-                    className="text-xl sm:text-2xl md:text-[1.65rem] text-[#1E1A17] font-semibold pt-1"
+                    className="text-xl sm:text-2xl md:text-[1.65rem] text-[#1E1A17] font-medium pt-1"
                   >
                     <span>{visibleText}</span>
                     {isActive && (
@@ -454,7 +454,7 @@ export default function ContactSection() {
                     key={para.id}
                     className="pt-6 border-t border-[#6F5A43]/20 flex items-center justify-between"
                   >
-                    <span className="text-2xl sm:text-3xl font-bold text-[#1E1A17] tracking-wider">
+                    <span className="text-2xl sm:text-3xl font-semibold text-[#1E1A17] tracking-wider">
                       <span>{visibleText}</span>
                       {isActive && (
                         <span className="inline-block w-[2.5px] h-[0.95em] bg-[#1E1A17] align-baseline ml-0.5 animate-pulse" />
@@ -555,8 +555,8 @@ export default function ContactSection() {
                     }
                     data-cursor="button"
                     className={`group relative w-full rounded-2xl sm:rounded-3xl border border-[#171717]/08 p-5 sm:p-6 sm:px-8 flex items-center justify-between cursor-pointer overflow-hidden transition-all duration-300 shadow-xs hover:shadow-md ${capsule.type === 'github'
-                        ? 'bg-[#FAF8F5] hover:bg-[#EFEAE2]'
-                        : 'bg-[#FAF8F5]'
+                      ? 'bg-[#FAF8F5] hover:bg-[#EFEAE2]'
+                      : 'bg-[#FAF8F5]'
                       }`}
                     style={{ transformStyle: 'preserve-3d' }}
                   >
@@ -588,10 +588,10 @@ export default function ContactSection() {
                       {/* Icon container */}
                       <div
                         className={`flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl sm:rounded-2xl transition-transform duration-300 ${capsule.type === 'resume'
-                            ? 'bg-[#171717]/05 text-[#171717] group-hover:-translate-y-1'
-                            : capsule.type === 'email'
-                              ? 'bg-[#171717]/05 text-[#171717] group-hover:scale-105'
-                              : 'bg-[#171717]/05 text-[#171717]'
+                          ? 'bg-[#171717]/05 text-[#171717] group-hover:-translate-y-1'
+                          : capsule.type === 'email'
+                            ? 'bg-[#171717]/05 text-[#171717] group-hover:scale-105'
+                            : 'bg-[#171717]/05 text-[#171717]'
                           }`}
                       >
                         {capsule.type === 'email' && (
@@ -647,7 +647,7 @@ export default function ContactSection() {
         </div>
 
         {/* BOTTOM FOOTER */}
-        <div className="mt-28 sm:mt-36 mb-10 text-center z-10">
+        <div className="mt-14 sm:mt-18 mb-2 text-center z-10">
           <p className="font-mono text-xs sm:text-sm text-[#171717]/50 tracking-wider leading-relaxed">
             Designed & Developed with
           </p>
