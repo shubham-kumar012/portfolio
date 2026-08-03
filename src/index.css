@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+
+  html.lenis,
+  html.lenis body {
+    height: auto;
+  }
+
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
+  .lenis.lenis-smooth iframe {
+    pointer-events: none;
+  }
+
+  body {
+    background-color: #F6F2EC;
+    color: #171717;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Custom typography and utility styles */
+.text-stroke-bg {
+  -webkit-text-stroke: 1.5px rgba(217, 208, 195, 0.45);
+  color: transparent;
+}
+
+.paper-grain-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+/* Hide standard mouse cursor on desktop when custom cursor is active */
+@media (min-width: 768px) {
+
+  body.custom-cursor-active,
+  body.custom-cursor-active a,
+  body.custom-cursor-active button,
+  body.custom-cursor-active [role="button"] {
+    cursor: default !important;
+  }
+}
+
+/* Spotlight glow effect following mouse position */
+.spotlight-glow {
+  background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+      rgba(111, 90, 67, 0.06),
+      transparent 40%);
+}
+
+/* Radial glow halo around portrait */
+.portrait-glow {
+  background: radial-gradient(400px circle at var(--portrait-x, 50%) var(--portrait-y, 50%),
+      rgba(111, 90, 67, 0.15),
+      transparent 70%);
+}
+
+/* Engineering Conveyor Belts Hardware-Accelerated Keyframes */
+@keyframes conveyor-ltr {
+  0% {
+    transform: translate3d(-50%, 0, 0);
+  }
+  100% {
+    transform: translate3d(0%, 0, 0);
+  }
+}
+
+@keyframes conveyor-rtl {
+  0% {
+    transform: translate3d(0%, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-conveyor-ltr {
+  animation: conveyor-ltr var(--conveyor-speed, 40s) linear infinite;
+  will-change: transform;
+}
+
+.animate-conveyor-rtl {
+  animation: conveyor-rtl var(--conveyor-speed, 40s) linear infinite;
+  will-change: transform;
+}
+
+.pause-conveyor {
+  animation-play-state: paused !important;
+}
+
+/* Natural handwritten font & stationery paper letter styling */
+.font-handwriting {
+  font-family: 'Edu TAS Beginner', cursive, sans-serif;
+  letter-spacing: 0.015em;
+}
+
+/* Faint ruled stationery paper lines */
+.paper-ruled-bg {
+  background-image: linear-gradient(to bottom, transparent 29px, rgba(160, 142, 120, 0.1) 30px);
+  background-size: 100% 30px;
+}
+
+/* Fountain pen ink effect on natural paper */
+.text-ink {
+  color: #241F1C;
+  text-shadow: 0.2px 0.2px 0.5px rgba(36, 31, 28, 0.2);
+}
