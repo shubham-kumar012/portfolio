@@ -9,9 +9,9 @@ export default function HeroSection({ mousePosition }) {
   const bgTypographyRef = useRef(null);
   const portraitRef = useRef(null);
   const cardsRef = useRef([]);
-
-  const { normalizedX, normalizedY, x, y } = mousePosition;
-
+  
+    const { normalizedX = 0, normalizedY = 0, x = 0, y = 0 } = mousePosition || {};
+  
   // Subtle 3D tilt effect on card hover based on cursor position
   const handleCardMouseMove = (e, index) => {
     const card = cardsRef.current[index];
