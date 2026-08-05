@@ -347,7 +347,7 @@ export default function ContactSection() {
       description: 'View & Download Resume',
       subtext: 'Google Drive PDF • Official Document',
       actionType: 'link',
-      url: 'https://drive.google.com/file/d/1E8m6CmKw8aPj4MYJ5tqAHvyYxE6taYvj/view?usp=drive_link',
+      url: 'https://drive.google.com/file/d/17bS-6gWXiPbbFNlAFZsB78hci9snS6c7/view?usp=sharing',
       type: 'resume',
     },
   ];

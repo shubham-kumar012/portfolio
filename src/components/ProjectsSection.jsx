@@ -24,8 +24,8 @@ const FEATURED_PROJECTS = [
     video: '/videos/sourcethread_work.mp4',
     poster: sourcethreadPoster,
     bgTint: 'rgba(224, 112, 64, 0.04)', // subtle warm orange tint
-    liveUrl: '#',
-    githubUrl: '#',
+    liveUrl: 'https://source-thread.netlify.app/',
+    githubUrl: 'https://github.com/shubham-kumar012/source-thread.git',
     caseStudyUrl: '#',
   },
   {
@@ -38,8 +38,8 @@ const FEATURED_PROJECTS = [
     video: '/videos/tickdone_work.mp4',
     poster: tickdonePoster,
     bgTint: 'rgba(180, 150, 110, 0.04)', // subtle warm beige tint
-    liveUrl: '#',
-    githubUrl: '#',
+    liveUrl: 'https://tickdone-a0it.onrender.com/',
+    githubUrl: 'https://github.com/shubham-kumar012/Projects/tree/main/tickdone',
     caseStudyUrl: '#',
   },
   {
@@ -52,8 +52,8 @@ const FEATURED_PROJECTS = [
     video: '/videos/cloudee_work.mp4',
     poster: cloudeePoster,
     bgTint: 'rgba(90, 160, 220, 0.04)', // subtle sky blue tint
-    liveUrl: '#',
-    githubUrl: '#',
+    liveUrl: 'https://shubham-kumar012.github.io/Projects/cloudee/',
+    githubUrl: 'https://github.com/shubham-kumar012/Projects/tree/main/cloudee',
     caseStudyUrl: '#',
   },
   {
@@ -66,8 +66,8 @@ const FEATURED_PROJECTS = [
     video: '/videos/twogood_work.mp4',
     poster: twogoodPoster,
     bgTint: 'rgba(230, 210, 180, 0.04)', // subtle cream tint
-    liveUrl: '#',
-    githubUrl: '#',
+    liveUrl: 'https://shubham-kumar012.github.io/Projects/twogood-landing/',
+    githubUrl: 'https://github.com/shubham-kumar012/Projects/tree/main/twogood-landing',
     caseStudyUrl: '#',
   },
 ];
@@ -82,8 +82,8 @@ const ARCHIVE_PROJECTS = [
     description: 'A fast-paced reaction game where players tap moving targets before time runs out.',
     tech: ['HTML', 'CSS', 'JavaScript'],
     video: '/videos/flashtap_work.mp4',
-    githubUrl: '#',
-    liveUrl: '#',
+    githubUrl: 'https://github.com/shubham-kumar012/Projects/tree/main/flashtap',
+    liveUrl: 'https://flashtap.vercel.app/',
   },
   {
     id: '06',
@@ -93,8 +93,8 @@ const ARCHIVE_PROJECTS = [
     description: 'A modern, minimal animated landing page with fluid GSAP entrance effects and dynamic motion-reactive cursor interactions.',
     tech: ['HTML', 'CSS', 'JavaScript', 'GSAP'],
     video: '/videos/monovite_work.mp4',
-    githubUrl: '#',
-    liveUrl: '#',
+    githubUrl: 'https://github.com/shubham-kumar012/Projects/tree/main/monovibe-landing',
+    liveUrl: 'https://shubham-kumar012.github.io/Projects/monovibe-landing/',
   },
   {
     id: '07',
@@ -104,8 +104,8 @@ const ARCHIVE_PROJECTS = [
     description: 'A simple and responsive stopwatch tracking minutes, seconds, and milliseconds in real-time with clean DOM timing functions.',
     tech: ['HTML', 'CSS', 'JavaScript'],
     video: '/videos/aetherTime_work.mp4',
-    githubUrl: '#',
-    liveUrl: '#',
+    githubUrl: 'https://github.com/shubham-kumar012/Projects/tree/main/aether-time',
+    liveUrl: 'https://shubham-kumar012.github.io/Projects/aether-time/',
   },
   {
     id: '08',
@@ -115,8 +115,8 @@ const ARCHIVE_PROJECTS = [
     description: 'A modern animated UAV technology website showcasing autonomous capabilities, modular drone systems, and product highlights.',
     tech: ['React', 'Vite', 'Tailwind CSS', 'Framer Motion', 'Lenis'],
     video: '/videos/vyomgarud_work.mp4',
-    githubUrl: '#',
-    liveUrl: '#',
+    githubUrl: 'https://github.com/shubham-kumar012/vyom-garud.git',
+    liveUrl: 'https://vyom-garud-git-main-shubhams-projects-84579036.vercel.app/?_vercel_share=IqCd1HwgcuMeZH4pQwDJt604ttwf4s85',
   },
 ];
 
@@ -254,7 +254,7 @@ export default function ProjectsSection() {
         archiveVideoRefs.current.forEach((v) => v && v.pause());
       } else {
         if (activeIndex >= 0 && videoRefs.current[activeIndex] && isSectionVisible) {
-          videoRefs.current[activeIndex].play().catch(() => {});
+          videoRefs.current[activeIndex].play().catch(() => { });
         }
         // Resume videos for visible archive cards
         if (isArchiveExpanded) {
@@ -265,7 +265,7 @@ export default function ProjectsSection() {
             const videoEl = archiveVideoRefs.current[idx];
             if (inView && videoEl) {
               videoEl.muted = true;
-              videoEl.play().catch(() => {});
+              videoEl.play().catch(() => { });
             }
           });
         }
@@ -301,7 +301,7 @@ export default function ProjectsSection() {
               videoEl.muted = true;
               const playPromise = videoEl.play();
               if (playPromise !== undefined) {
-                playPromise.catch(() => {});
+                playPromise.catch(() => { });
               }
             } else {
               videoEl.pause();
@@ -411,8 +411,8 @@ export default function ProjectsSection() {
       {/* FIXED VERTICAL PROGRESS INDICATOR (Visible only inside Projects Section) */}
       <div
         className={`hidden md:flex fixed left-6 lg:left-10 top-1/2 -translate-y-1/2 z-40 flex-col items-center gap-3 p-2.5 rounded-full bg-[#ECE5DA]/50 backdrop-blur-md border border-[#D9D0C3]/60 shadow-xs transition-all duration-500 ${isSectionVisible
-            ? 'opacity-100 translate-x-0 pointer-events-auto'
-            : 'opacity-0 -translate-x-6 pointer-events-none'
+          ? 'opacity-100 translate-x-0 pointer-events-auto'
+          : 'opacity-0 -translate-x-6 pointer-events-none'
           }`}
       >
         {FEATURED_PROJECTS.map((proj, idx) => {
@@ -427,8 +427,8 @@ export default function ProjectsSection() {
               >
                 <span
                   className={`block rounded-full transition-all duration-500 ${isActive
-                      ? 'w-3 h-3 bg-[#6F5A43] shadow-[0_0_10px_rgba(111,90,67,0.7)] scale-110'
-                      : 'w-2 h-2 bg-[#D9D0C3] group-hover:bg-[#6F5A43]/70 group-hover:scale-125'
+                    ? 'w-3 h-3 bg-[#6F5A43] shadow-[0_0_10px_rgba(111,90,67,0.7)] scale-110'
+                    : 'w-2 h-2 bg-[#D9D0C3] group-hover:bg-[#6F5A43]/70 group-hover:scale-125'
                     }`}
                 />
               </button>
@@ -482,8 +482,8 @@ export default function ProjectsSection() {
                   transition: 'box-shadow 0.5s ease, background-color 0.5s ease, border-color 0.5s ease',
                 }}
                 className={`group relative w-full rounded-2xl sm:rounded-3xl p-5 sm:p-7 border transition-all duration-500 overflow-hidden ${isActive
-                    ? 'bg-[#ECE5DA] border-[#6F5A43]/50 shadow-card-hover'
-                    : 'bg-[#ECE5DA]/70 border-[#D9D0C3] shadow-card-soft hover:border-[#6F5A43]/30 hover:bg-[#ECE5DA]'
+                  ? 'bg-[#ECE5DA] border-[#6F5A43]/50 shadow-card-hover'
+                  : 'bg-[#ECE5DA]/70 border-[#D9D0C3] shadow-card-soft hover:border-[#6F5A43]/30 hover:bg-[#ECE5DA]'
                   }`}
               >
                 {/* VIDEO EXHIBITION FRAME (Sleek Widescreen Ratio & Height Cap) */}
@@ -530,8 +530,8 @@ export default function ProjectsSection() {
 
                     <span
                       className={`inline-block w-2.5 h-2.5 rounded-full transition-all duration-500 ${isActive
-                          ? 'bg-[#6F5A43] shadow-[0_0_10px_rgba(111,90,67,0.8)] scale-125'
-                          : 'bg-[#D9D0C3]'
+                        ? 'bg-[#6F5A43] shadow-[0_0_10px_rgba(111,90,67,0.8)] scale-125'
+                        : 'bg-[#D9D0C3]'
                         }`}
                     />
                   </div>
@@ -565,8 +565,8 @@ export default function ProjectsSection() {
                   {/* ACTION BUTTONS (Revealed smoothly on Active Focus Mode) */}
                   <div
                     className={`flex flex-wrap items-center gap-3 sm:gap-4 pt-3 transition-all duration-500 ease-out ${isActive
-                        ? 'opacity-100 translate-y-0 pointer-events-auto'
-                        : 'opacity-0 translate-y-4 pointer-events-none h-0 overflow-hidden pt-0'
+                      ? 'opacity-100 translate-y-0 pointer-events-auto'
+                      : 'opacity-0 translate-y-4 pointer-events-none h-0 overflow-hidden pt-0'
                       }`}
                   >
                     {/* Primary: Live Demo */}
