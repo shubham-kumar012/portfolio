@@ -491,7 +491,7 @@ export default function ContactSection() {
 
         {/* PRIMARY BUTTON: "Let's Connect →" */}
         <div ref={buttonContainerRef} className="mb-4">
-          <Magnetic strength={0.35}>
+          <Magnetic strength={0.15}>
             <button
               onClick={handleConnectClick}
               data-cursor="button"

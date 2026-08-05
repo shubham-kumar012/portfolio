@@ -67,7 +67,7 @@ export default function Navbar() {
         }`}
       >
         {/* Brand logo */}
-        <Magnetic strength={0.25}>
+        <Magnetic strength={0.10}>
           <a
             href="#"
             data-cursor="link"
@@ -110,7 +110,7 @@ export default function Navbar() {
         </ul>
 
         {/* Primary CTA button */}
-        <Magnetic strength={0.4}>
+        <Magnetic strength={0.15}>
           <a
             href="#contact"
             data-cursor="button"

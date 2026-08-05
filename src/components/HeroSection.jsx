@@ -193,7 +193,7 @@ export default function HeroSection() {
 
           {/* Primary & secondary CTAs */}
           <div id="hero-ctas" className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-            <Magnetic strength={0.4}>
+            <Magnetic strength={0.15}>
               <a
                 href="#projects"
                 data-cursor="button"
@@ -204,7 +204,7 @@ export default function HeroSection() {
               </a>
             </Magnetic>
 
-            <Magnetic strength={0.4}>
+            <Magnetic strength={0.15}>
               <a
                 href="#contact"
                 data-cursor="button"

@@ -76,41 +76,45 @@ const FEATURED_PROJECTS = [
 const ARCHIVE_PROJECTS = [
   {
     id: '05',
-    title: 'DevOverflow Community',
-    description: 'Full-stack developer Q&A platform featuring recommendation algorithms, reputation scoring, markdown editor, and AI search.',
-    tech: ['Next.js', 'TypeScript', 'MongoDB', 'Tailwind CSS'],
-    category: 'Full Stack',
+    title: 'FlashTap',
+    category: 'Reaction Game',
     year: '2024',
+    description: 'A fast-paced reaction game where players tap moving targets before time runs out.',
+    tech: ['HTML', 'CSS', 'JavaScript'],
+    video: '/videos/flashtap_work.mp4',
     githubUrl: '#',
     liveUrl: '#',
   },
   {
     id: '06',
-    title: 'AI Resume Synthesizer',
-    description: 'Intelligent career document tailoring engine with automated ATS optimization and real-time layout preview.',
-    tech: ['React', 'Node.js', 'OpenAI API', 'Tailwind'],
-    category: 'AI Product',
+    title: 'Monovibe',
+    category: 'Animated Landing Page',
     year: '2024',
+    description: 'A modern, minimal animated landing page with fluid GSAP entrance effects and dynamic motion-reactive cursor interactions.',
+    tech: ['HTML', 'CSS', 'JavaScript', 'GSAP'],
+    video: '/videos/monovite_work.mp4',
     githubUrl: '#',
     liveUrl: '#',
   },
   {
     id: '07',
-    title: 'Editorial Design System',
-    description: 'Production component library emphasizing fluid typography, micro-interactions, dark mode, and high-performance physics.',
-    tech: ['React', 'Storybook', 'Tailwind', 'GSAP'],
-    category: 'Design Engineering',
-    year: '2023',
+    title: 'AetherTime',
+    category: 'Stopwatch Web App',
+    year: '2024',
+    description: 'A simple and responsive stopwatch tracking minutes, seconds, and milliseconds in real-time with clean DOM timing functions.',
+    tech: ['HTML', 'CSS', 'JavaScript'],
+    video: '/videos/aetherTime_work.mp4',
     githubUrl: '#',
     liveUrl: '#',
   },
   {
     id: '08',
-    title: 'Minimalist Workspace Engine',
-    description: 'Offline-first markdown note environment built for rapid keyboard navigation, local encryption, and instant search.',
-    tech: ['Electron', 'React', 'Zustand', 'Tailwind'],
-    category: 'Desktop App',
-    year: '2023',
+    title: 'Vyom Garud',
+    category: 'Autonomous UAV Systems',
+    year: '2024',
+    description: 'A modern animated UAV technology website showcasing autonomous capabilities, modular drone systems, and product highlights.',
+    tech: ['React', 'Vite', 'Tailwind CSS', 'Framer Motion', 'Lenis'],
+    video: '/videos/vyomgarud_work.mp4',
     githubUrl: '#',
     liveUrl: '#',
   },
@@ -127,6 +131,9 @@ export default function ProjectsSection() {
   const [activeBgTint, setActiveBgTint] = useState('transparent');
   const [isArchiveExpanded, setIsArchiveExpanded] = useState(false);
   const [isSectionVisible, setIsSectionVisible] = useState(false);
+
+  const archiveVideoRefs = useRef([]);
+  const archiveCardRefs = useRef([]);
 
   // 1. ScrollTrigger setup for Focus Mode & 70% viewport active state
   useEffect(() => {
@@ -202,7 +209,7 @@ export default function ProjectsSection() {
 
     videoRefs.current.forEach((videoEl, idx) => {
       if (!videoEl) return;
-      if (idx === index) {
+      if (idx === index && !document.hidden) {
         videoEl.muted = true;
         const playPromise = videoEl.play();
         if (playPromise !== undefined) {
@@ -228,6 +235,90 @@ export default function ProjectsSection() {
       videoEl.currentTime = 0;
     }
   };
+
+
+
+  // Refresh ScrollTrigger whenever archive section expands or collapses
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [isArchiveExpanded]);
+
+  // Global tab visibility listener
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        videoRefs.current.forEach((v) => v && v.pause());
+        archiveVideoRefs.current.forEach((v) => v && v.pause());
+      } else {
+        if (activeIndex >= 0 && videoRefs.current[activeIndex] && isSectionVisible) {
+          videoRefs.current[activeIndex].play().catch(() => {});
+        }
+        // Resume videos for visible archive cards
+        if (isArchiveExpanded) {
+          archiveCardRefs.current.forEach((cardEl, idx) => {
+            if (!cardEl) return;
+            const rect = cardEl.getBoundingClientRect();
+            const inView = rect.top < window.innerHeight && rect.bottom > 0;
+            const videoEl = archiveVideoRefs.current[idx];
+            if (inView && videoEl) {
+              videoEl.muted = true;
+              videoEl.play().catch(() => {});
+            }
+          });
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [activeIndex, isArchiveExpanded, isSectionVisible]);
+
+  // Pause all featured videos when leaving the section
+  useEffect(() => {
+    if (!isSectionVisible) {
+      videoRefs.current.forEach((v) => v && v.pause());
+    }
+  }, [isSectionVisible]);
+
+  // IntersectionObserver for expanded archive cards: play continuously when in view, pause when out of view
+  useEffect(() => {
+    if (!isArchiveExpanded) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const index = archiveCardRefs.current.indexOf(entry.target);
+          if (index !== -1) {
+            const videoEl = archiveVideoRefs.current[index];
+            if (!videoEl) return;
+
+            if (entry.isIntersecting && !document.hidden) {
+              videoEl.muted = true;
+              const playPromise = videoEl.play();
+              if (playPromise !== undefined) {
+                playPromise.catch(() => {});
+              }
+            } else {
+              videoEl.pause();
+            }
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    // Observe active archive cards
+    archiveCardRefs.current.forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, [isArchiveExpanded]);
 
   // 3. Direct GSAP card mouse tilt & 2-3px video shift (zero React re-renders)
   const handleMouseMove = (e, index) => {
@@ -319,11 +410,10 @@ export default function ProjectsSection() {
 
       {/* FIXED VERTICAL PROGRESS INDICATOR (Visible only inside Projects Section) */}
       <div
-        className={`hidden md:flex fixed left-6 lg:left-10 top-1/2 -translate-y-1/2 z-40 flex-col items-center gap-3 p-2.5 rounded-full bg-[#ECE5DA]/50 backdrop-blur-md border border-[#D9D0C3]/60 shadow-xs transition-all duration-500 ${
-          isSectionVisible
+        className={`hidden md:flex fixed left-6 lg:left-10 top-1/2 -translate-y-1/2 z-40 flex-col items-center gap-3 p-2.5 rounded-full bg-[#ECE5DA]/50 backdrop-blur-md border border-[#D9D0C3]/60 shadow-xs transition-all duration-500 ${isSectionVisible
             ? 'opacity-100 translate-x-0 pointer-events-auto'
             : 'opacity-0 -translate-x-6 pointer-events-none'
-        }`}
+          }`}
       >
         {FEATURED_PROJECTS.map((proj, idx) => {
           const isActive = idx === activeIndex;
@@ -336,18 +426,16 @@ export default function ProjectsSection() {
                 className="group relative flex items-center justify-center p-1 focus:outline-none"
               >
                 <span
-                  className={`block rounded-full transition-all duration-500 ${
-                    isActive
+                  className={`block rounded-full transition-all duration-500 ${isActive
                       ? 'w-3 h-3 bg-[#6F5A43] shadow-[0_0_10px_rgba(111,90,67,0.7)] scale-110'
                       : 'w-2 h-2 bg-[#D9D0C3] group-hover:bg-[#6F5A43]/70 group-hover:scale-125'
-                  }`}
+                    }`}
                 />
               </button>
               {idx < FEATURED_PROJECTS.length - 1 && (
                 <div
-                  className={`w-[1px] h-5 transition-colors duration-500 ${
-                    isActive ? 'bg-[#6F5A43]' : 'bg-[#D9D0C3]/60'
-                  }`}
+                  className={`w-[1px] h-5 transition-colors duration-500 ${isActive ? 'bg-[#6F5A43]' : 'bg-[#D9D0C3]/60'
+                    }`}
                 />
               )}
             </React.Fragment>
@@ -393,11 +481,10 @@ export default function ProjectsSection() {
                 style={{
                   transition: 'box-shadow 0.5s ease, background-color 0.5s ease, border-color 0.5s ease',
                 }}
-                className={`group relative w-full rounded-2xl sm:rounded-3xl p-5 sm:p-7 border transition-all duration-500 overflow-hidden ${
-                  isActive
+                className={`group relative w-full rounded-2xl sm:rounded-3xl p-5 sm:p-7 border transition-all duration-500 overflow-hidden ${isActive
                     ? 'bg-[#ECE5DA] border-[#6F5A43]/50 shadow-card-hover'
                     : 'bg-[#ECE5DA]/70 border-[#D9D0C3] shadow-card-soft hover:border-[#6F5A43]/30 hover:bg-[#ECE5DA]'
-                }`}
+                  }`}
               >
                 {/* VIDEO EXHIBITION FRAME (Sleek Widescreen Ratio & Height Cap) */}
                 <div
@@ -419,9 +506,8 @@ export default function ProjectsSection() {
 
                   {/* Active Playing Badge Pill */}
                   <div
-                    className={`absolute top-3.5 right-3.5 z-20 flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#171717]/80 backdrop-blur-md text-[#F6F2EC] text-[10px] font-semibold tracking-widest uppercase transition-all duration-500 ${
-                      isActive ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
-                    }`}
+                    className={`absolute top-3.5 right-3.5 z-20 flex items-center gap-2 px-2.5 py-1 rounded-full bg-[#171717]/80 backdrop-blur-md text-[#F6F2EC] text-[10px] font-semibold tracking-widest uppercase transition-all duration-500 ${isActive ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-2 pointer-events-none'
+                      }`}
                   >
                     <span className="w-1.5 h-1.5 rounded-full bg-[#6F5A43] animate-ping" />
                     <span>PLAYING DEMO</span>
@@ -443,20 +529,18 @@ export default function ProjectsSection() {
                     </div>
 
                     <span
-                      className={`inline-block w-2.5 h-2.5 rounded-full transition-all duration-500 ${
-                        isActive
+                      className={`inline-block w-2.5 h-2.5 rounded-full transition-all duration-500 ${isActive
                           ? 'bg-[#6F5A43] shadow-[0_0_10px_rgba(111,90,67,0.8)] scale-125'
                           : 'bg-[#D9D0C3]'
-                      }`}
+                        }`}
                     />
                   </div>
 
                   {/* Title & Description */}
                   <div>
                     <h3
-                      className={`font-editorial text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight leading-tight transition-colors duration-300 ${
-                        isActive ? 'text-[#171717]' : 'text-[#171717]/85 group-hover:text-[#171717]'
-                      }`}
+                      className={`font-editorial text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight leading-tight transition-colors duration-300 ${isActive ? 'text-[#171717]' : 'text-[#171717]/85 group-hover:text-[#171717]'
+                        }`}
                     >
                       {project.title}
                     </h3>
@@ -480,14 +564,13 @@ export default function ProjectsSection() {
 
                   {/* ACTION BUTTONS (Revealed smoothly on Active Focus Mode) */}
                   <div
-                    className={`flex flex-wrap items-center gap-3 sm:gap-4 pt-3 transition-all duration-500 ease-out ${
-                      isActive
+                    className={`flex flex-wrap items-center gap-3 sm:gap-4 pt-3 transition-all duration-500 ease-out ${isActive
                         ? 'opacity-100 translate-y-0 pointer-events-auto'
                         : 'opacity-0 translate-y-4 pointer-events-none h-0 overflow-hidden pt-0'
-                    }`}
+                      }`}
                   >
                     {/* Primary: Live Demo */}
-                    <Magnetic strength={0.35}>
+                    <Magnetic strength={0.15}>
                       <a
                         href={project.liveUrl}
                         target="_blank"
@@ -502,7 +585,7 @@ export default function ProjectsSection() {
                     </Magnetic>
 
                     {/* Secondary: GitHub */}
-                    <Magnetic strength={0.35}>
+                    <Magnetic strength={0.15}>
                       <a
                         href={project.githubUrl}
                         target="_blank"
@@ -544,7 +627,7 @@ export default function ProjectsSection() {
           </p>
 
           {/* LARGE INTERACTIVE CTA BUTTON */}
-          <Magnetic strength={0.4}>
+          <Magnetic strength={0.15}>
             <button
               onClick={() => setIsArchiveExpanded(!isArchiveExpanded)}
               data-cursor="button"
@@ -552,9 +635,8 @@ export default function ProjectsSection() {
             >
               <span>{isArchiveExpanded ? 'Collapse Archive' : 'Explore Project Archive'}</span>
               <HiArrowRight
-                className={`text-base transition-transform duration-300 ${
-                  isArchiveExpanded ? 'rotate-90' : 'group-hover:translate-x-1.5'
-                }`}
+                className={`text-base transition-transform duration-300 ${isArchiveExpanded ? 'rotate-90' : 'group-hover:translate-x-1.5'
+                  }`}
               />
             </button>
           </Magnetic>
@@ -562,61 +644,93 @@ export default function ProjectsSection() {
 
         {/* EXPANDABLE ARCHIVE LIST (Unfolds seamlessly without page refresh) */}
         {isArchiveExpanded && (
-          <div className="mt-8 text-left space-y-4 animate-fadeIn transition-all duration-700">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-              {ARCHIVE_PROJECTS.map((archItem) => (
+          <div className="mt-10 text-left space-y-6 animate-fadeIn transition-all duration-700">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+              {ARCHIVE_PROJECTS.map((archItem, archIdx) => (
                 <div
                   key={archItem.id}
-                  className="group relative p-6 sm:p-7 rounded-2xl bg-[#ECE5DA] border border-[#D9D0C3] hover:border-[#6F5A43]/40 transition-all duration-300 hover:shadow-card-hover flex flex-col justify-between"
+                  ref={(el) => (archiveCardRefs.current[archIdx] = el)}
+                  className="group relative p-5 sm:p-6 rounded-2xl bg-[#ECE5DA] border border-[#D9D0C3] hover:border-[#6F5A43]/50 transition-all duration-500 hover:shadow-card-hover flex flex-col justify-between overflow-hidden cursor-pointer"
                 >
-                  <div>
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="font-editorial text-xs font-bold text-[#6F5A43] uppercase tracking-wider">
-                        {archItem.id} // {archItem.category}
-                      </span>
-                      <span className="text-xs font-semibold text-[#171717]/50">
-                        {archItem.year}
-                      </span>
+                  {/* Top: Widescreen Landscape Video Preview */}
+                  {archItem.video && (
+                    <div className="relative w-full aspect-[16/9] rounded-xl overflow-hidden bg-[#171717] mb-5 border border-[#171717]/10 shadow-md">
+                      <video
+                        ref={(el) => (archiveVideoRefs.current[archIdx] = el)}
+                        src={archItem.video}
+                        autoPlay
+                        loop
+                        muted
+                        playsInline
+                        preload="auto"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                      />
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#171717]/20 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity duration-500" />
                     </div>
+                  )}
 
-                    <h4 className="font-editorial text-xl sm:text-2xl font-bold text-[#171717] group-hover:text-[#6F5A43] transition-colors duration-200 mb-2">
-                      {archItem.title}
-                    </h4>
-
-                    <p className="text-xs sm:text-sm text-[#171717]/75 font-sans leading-relaxed mb-4">
-                      {archItem.description}
-                    </p>
-                  </div>
-
-                  <div>
-                    <div className="flex flex-wrap items-center gap-1.5 mb-4">
-                      {archItem.tech.map((t, idx) => (
-                        <span
-                          key={idx}
-                          className="px-2.5 py-0.5 rounded-full bg-[#F6F2EC] border border-[#D9D0C3]/60 text-[#171717]/70 text-[10px] font-medium"
-                        >
-                          {t}
+                  {/* Bottom: Details, Tech Tags & Action Links */}
+                  <div className="flex-1 flex flex-col justify-between gap-4">
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-editorial text-xs font-bold text-[#6F5A43] uppercase tracking-wider">
+                          {archItem.id} // {archItem.category}
                         </span>
-                      ))}
+                        <span className="text-xs font-semibold text-[#171717]/50 font-sans">
+                          {archItem.year}
+                        </span>
+                      </div>
+
+                      <h4 className="font-editorial text-xl sm:text-2xl font-bold text-[#171717] group-hover:text-[#6F5A43] transition-colors duration-300 mb-2">
+                        {archItem.title}
+                      </h4>
+
+                      <p className="text-xs sm:text-sm text-[#171717]/80 font-sans leading-relaxed mb-4">
+                        {archItem.description}
+                      </p>
                     </div>
 
-                    <div className="flex items-center gap-4 pt-2 border-t border-[#D9D0C3]/50">
-                      <a
-                        href={archItem.githubUrl}
-                        data-cursor="link"
-                        className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[#171717] hover:text-[#6F5A43] transition-colors"
-                      >
-                        <span>Code</span>
-                        <HiArrowUpRight className="text-xs" />
-                      </a>
-                      <a
-                        href={archItem.liveUrl}
-                        data-cursor="link"
-                        className="inline-flex items-center gap-1 text-xs font-semibold uppercase tracking-wider text-[#171717] hover:text-[#6F5A43] transition-colors"
-                      >
-                        <span>Preview</span>
-                        <HiArrowUpRight className="text-xs" />
-                      </a>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-1.5 mb-4">
+                        {archItem.tech.map((t, idx) => (
+                          <span
+                            key={idx}
+                            className="px-2.5 py-0.5 rounded-full bg-[#F6F2EC] border border-[#D9D0C3] text-[#171717]/80 text-[11px] font-medium font-sans tracking-wide"
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+
+                      <div className="flex items-center gap-4 pt-3 border-t border-[#D9D0C3]/60">
+                        <Magnetic strength={0.1}>
+                          <a
+                            href={archItem.githubUrl || '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-cursor="button"
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#171717] hover:text-[#6F5A43] transition-colors"
+                          >
+                            <HiCodeBracket className="text-sm" />
+                            <span>Code</span>
+                            <HiArrowUpRight className="text-xs" />
+                          </a>
+                        </Magnetic>
+
+                        <Magnetic strength={0.1}>
+                          <a
+                            href={archItem.liveUrl || '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            data-cursor="button"
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-[#171717] hover:text-[#6F5A43] transition-colors"
+                          >
+                            <HiEye className="text-sm" />
+                            <span>Preview</span>
+                            <HiArrowUpRight className="text-xs" />
+                          </a>
+                        </Magnetic>
+                      </div>
                     </div>
                   </div>
                 </div>
