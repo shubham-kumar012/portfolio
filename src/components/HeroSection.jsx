@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { HiArrowRight, HiArrowUpRight } from 'react-icons/hi2';
 import Magnetic from './Magnetic';
-import profileImg from '../assets/profile.png';
+import profileImg from '../assets/profile.webp';
 
 export default function HeroSection() {
   const heroRef = useRef(null);
