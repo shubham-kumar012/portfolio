@@ -520,7 +520,7 @@ export default function ProjectsSection() {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <span className="font-editorial text-xs font-bold tracking-widest text-[#6F5A43] uppercase">
-                        {project.id} // PROJECT
+                        {project.id}. PROJECT
                       </span>
                       <span className="h-3 w-[1px] bg-[#6F5A43]/30" />
                       <span className="text-xs font-semibold text-[#171717]/60 tracking-wide font-sans">
@@ -674,7 +674,7 @@ export default function ProjectsSection() {
                     <div>
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-editorial text-xs font-bold text-[#6F5A43] uppercase tracking-wider">
-                          {archItem.id} // {archItem.category}
+                          {archItem.id}. {archItem.category}
                         </span>
                         <span className="text-xs font-semibold text-[#171717]/50 font-sans">
                           {archItem.year}

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -9,11 +9,22 @@ import JourneySection from './components/JourneySection';
 import ProjectsSection from './components/ProjectsSection';
 import EngineeringToolbox from './components/EngineeringToolbox';
 import ContactSection from './components/ContactSection';
+import Preloader from './components/Preloader';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function App() {
+  const heroTimelineRef = useRef(null);
+  const lenisRef = useRef(null);
+
   useEffect(() => {
+    // Disable automatic browser scroll restoration on refresh so page always resets to Hero top
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+    ScrollTrigger.clearScrollMemory();
+
     // Set up smooth scrolling so page movement feels fluid
     const lenis = new Lenis({
       duration: 1.2,
@@ -21,6 +32,13 @@ export default function App() {
       smoothWheel: true,
       wheelMultiplier: 1.0,
     });
+
+    lenisRef.current = lenis;
+
+    // Immediately reset scroll position to top and lock scrolling while preloader is active
+    lenis.scrollTo(0, { immediate: true });
+    lenis.stop();
+    document.body.style.overflow = 'hidden';
 
     lenis.on('scroll', ScrollTrigger.update);
 
@@ -30,9 +48,17 @@ export default function App() {
 
     gsap.ticker.lagSmoothing(0);
 
-    // Kick off the entrance sequence when the page first loads
+    // Prepare hero entrance sequence (paused initially until preloader finishes)
     const ctx = gsap.context(() => {
+      // Ensure navbar and hero elements are completely hidden initially while preloader is active
+      gsap.set('#navbar', { y: -100, opacity: 0 });
+      gsap.set(
+        ['#hero-bg-text-1', '#hero-bg-text-2', '#hero-portrait', '#hero-badge', '#hero-intro', '.hero-stat-card', '#hero-ctas', '#hero-scroll-indicator'],
+        { opacity: 0 }
+      );
+
       const tl = gsap.timeline({
+        paused: true,
         defaults: { ease: 'power3.out' },
       });
 
@@ -91,16 +117,37 @@ export default function App() {
           { opacity: 0.8, y: 0, duration: 0.4 },
           '-=0.2'
         );
+
+      heroTimelineRef.current = tl;
     });
 
     return () => {
+      document.body.style.overflow = '';
       ctx.revert();
       lenis.destroy();
     };
   }, []);
 
+  const handleLoaderComplete = () => {
+    // Force scroll position to top (0,0) before unlocking Lenis
+    window.scrollTo(0, 0);
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true });
+      lenisRef.current.start();
+    }
+    document.body.style.overflow = '';
+    ScrollTrigger.refresh();
+
+    if (heroTimelineRef.current) {
+      heroTimelineRef.current.play();
+    }
+  };
+
   return (
     <div className="relative bg-[#F6F2EC] text-[#171717] min-h-screen font-sans selection:bg-[#6F5A43] selection:text-[#F6F2EC]">
+      {/* Luxury Opening Scene Preloader */}
+      <Preloader onComplete={handleLoaderComplete} />
+
       {/* Paper grain overlay texture */}
       <PaperGrain />
 
