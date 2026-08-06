@@ -5,10 +5,10 @@ import { HiArrowRight, HiArrowUpRight, HiCodeBracket, HiEye, HiDocumentText, HiC
 import Magnetic from './Magnetic';
 
 // Project Image Posters (from src/assets/projects/)
-import sourcethreadPoster from '../assets/projects/sourceThread_work.png';
-import tickdonePoster from '../assets/projects/tickdone_work.png';
-import cloudeePoster from '../assets/projects/cloudee_work.png';
-import twogoodPoster from '../assets/projects/twogood_work.png';
+import sourcethreadPoster from '../assets/projects/sourceThread_work.webp';
+import tickdonePoster from '../assets/projects/tickdone_work.webp';
+import cloudeePoster from '../assets/projects/cloudee_work.webp';
+import twogoodPoster from '../assets/projects/twogood_work.webp';
 
 gsap.registerPlugin(ScrollTrigger);
 
