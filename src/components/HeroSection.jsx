@@ -100,6 +100,26 @@ export default function HeroSection() {
     { number: 'Active', label: 'Open to Work', sub: 'Full Stack Roles' },
   ];
 
+  const navigateTo = (e, path, sectionId) => {
+    e.preventDefault();
+    window.isNavigating = true;
+    if (window.navScrollTimer) clearTimeout(window.navScrollTimer);
+
+    if (window.location.pathname !== path) {
+      window.history.pushState(null, '', path);
+      window.dispatchEvent(new Event('pathnamechange'));
+    }
+    const targetEl = document.getElementById(sectionId);
+    if (targetEl) {
+      const topOffset = targetEl.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top: topOffset, behavior: 'smooth' });
+    }
+
+    window.navScrollTimer = setTimeout(() => {
+      window.isNavigating = false;
+    }, 1100);
+  };
+
   return (
     <section
       ref={heroRef}
@@ -206,7 +226,8 @@ export default function HeroSection() {
           <div id="hero-ctas" className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
             <Magnetic strength={0.15}>
               <a
-                href="#projects"
+                href="/projects"
+                onClick={(e) => navigateTo(e, '/projects', 'projects')}
                 data-cursor="button"
                 className="group relative inline-flex items-center gap-3 px-7 py-3.5 rounded-full bg-[#171717] text-[#F6F2EC] text-xs sm:text-sm font-semibold uppercase tracking-wider shadow-md hover:bg-[#6F5A43] hover:shadow-btn transition-all duration-300"
               >
@@ -217,7 +238,8 @@ export default function HeroSection() {
 
             <Magnetic strength={0.15}>
               <a
-                href="#contact"
+                href="/contact"
+                onClick={(e) => navigateTo(e, '/contact', 'contact')}
                 data-cursor="button"
                 className="group relative inline-flex items-center gap-2.5 px-7 py-3.5 rounded-full border border-[#171717]/30 bg-transparent text-[#171717] text-xs sm:text-sm font-semibold uppercase tracking-wider hover:border-[#171717] hover:bg-[#ECE5DA] transition-all duration-300"
               >

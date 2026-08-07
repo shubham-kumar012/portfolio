@@ -118,6 +118,40 @@ export default function App() {
           '-=0.2'
         );
 
+      // Sync browser URL cleanly without hashes (#) as sections scroll into view
+      const sections = [
+        { id: 'hero', path: '/' },
+        { id: 'journey', path: '/journey' },
+        { id: 'projects', path: '/projects' },
+        { id: 'toolbox', path: '/toolbox' },
+        { id: 'contact', path: '/contact' },
+      ];
+
+      sections.forEach(({ id, path }) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+
+        ScrollTrigger.create({
+          trigger: el,
+          start: 'top 45%',
+          end: 'bottom 45%',
+          onEnter: () => {
+            if (window.isNavigating) return;
+            if (window.location.pathname !== path) {
+              window.history.replaceState(null, '', path);
+              window.dispatchEvent(new Event('pathnamechange'));
+            }
+          },
+          onEnterBack: () => {
+            if (window.isNavigating) return;
+            if (window.location.pathname !== path) {
+              window.history.replaceState(null, '', path);
+              window.dispatchEvent(new Event('pathnamechange'));
+            }
+          },
+        });
+      });
+
       heroTimelineRef.current = tl;
     });
 
@@ -129,13 +163,36 @@ export default function App() {
   }, []);
 
   const handleLoaderComplete = () => {
-    // Force scroll position to top (0,0) before unlocking Lenis
-    window.scrollTo(0, 0);
+    document.body.style.overflow = '';
+    const initialPath = window.location.pathname.toLowerCase();
+
+    const pathMap = {
+      '/journey': 'journey',
+      '/projects': 'projects',
+      '/toolbox': 'toolbox',
+      '/contact': 'contact',
+    };
+
+    const targetId = pathMap[initialPath];
+    if (targetId) {
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        const topOffset = targetEl.getBoundingClientRect().top + window.scrollY - 80;
+        window.scrollTo(0, topOffset);
+        if (lenisRef.current) {
+          lenisRef.current.scrollTo(topOffset, { immediate: true });
+        }
+      }
+    } else {
+      window.scrollTo(0, 0);
+      if (lenisRef.current) {
+        lenisRef.current.scrollTo(0, { immediate: true });
+      }
+    }
+
     if (lenisRef.current) {
-      lenisRef.current.scrollTo(0, { immediate: true });
       lenisRef.current.start();
     }
-    document.body.style.overflow = '';
     ScrollTrigger.refresh();
 
     if (heroTimelineRef.current) {
