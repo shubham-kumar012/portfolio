@@ -135,6 +135,11 @@ export default function ProjectsSection() {
   const archiveVideoRefs = useRef([]);
   const archiveCardRefs = useRef([]);
 
+  // Fast performance refs for 3D tilt tracking with zero main-thread layout thrashing
+  const cardRectsRef = useRef({});
+  const cardQuickToRefs = useRef({});
+  const videoQuickToRefs = useRef({});
+
   // 1. ScrollTrigger setup for Focus Mode & 70% viewport active state
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -320,25 +325,32 @@ export default function ProjectsSection() {
     return () => observer.disconnect();
   }, [isArchiveExpanded]);
 
-  // 3. Direct GSAP card mouse tilt & 2-3px video shift (zero React re-renders)
-  const handleMouseMove = (e, index) => {
+  // 3. Smooth & Deep 3D Card Tilt & Video Parallax (Cached Rects + GSAP Overwrite Auto)
+  const handleMouseEnter = (e, index) => {
     const card = e.currentTarget;
-    const rect = card.getBoundingClientRect();
+    cardRectsRef.current[index] = card.getBoundingClientRect();
+  };
+
+  const handleMouseMove = (e, index) => {
+    const card = cardRefs.current[index] || e.currentTarget;
+    const rect = cardRectsRef.current[index] || card.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
     const y = e.clientY - rect.top - rect.height / 2;
 
-    const rotateX = (-y / (rect.height / 2)) * 2.5;
-    const rotateY = (x / (rect.width / 2)) * 2.5;
-    const shiftX = (x / (rect.width / 2)) * 3;
-    const shiftY = (y / (rect.height / 2)) * 3;
+    // Refined & subtle 3D tilt calculation
+    const rotateX = (-y / (rect.height / 2)) * 2.2;
+    const rotateY = (x / (rect.width / 2)) * 2.2;
+    const shiftX = (x / (rect.width / 2)) * 2.5;
+    const shiftY = (y / (rect.height / 2)) * 2.5;
 
     gsap.to(card, {
       rotateX,
       rotateY,
       transformPerspective: 1000,
-      scale: 1.015,
+      scale: 1.012,
       duration: 0.25,
       ease: 'power2.out',
+      overwrite: 'auto',
     });
 
     const videoEl = videoRefs.current[index];
@@ -348,11 +360,13 @@ export default function ProjectsSection() {
         y: shiftY,
         duration: 0.25,
         ease: 'power2.out',
+        overwrite: 'auto',
       });
     }
   };
 
   const handleMouseLeave = (index) => {
+    delete cardRectsRef.current[index];
     const card = cardRefs.current[index];
     if (card) {
       gsap.to(card, {
@@ -361,6 +375,7 @@ export default function ProjectsSection() {
         scale: 1,
         duration: 0.4,
         ease: 'power2.out',
+        overwrite: 'auto',
       });
     }
     const videoEl = videoRefs.current[index];
@@ -370,6 +385,7 @@ export default function ProjectsSection() {
         y: 0,
         duration: 0.4,
         ease: 'power2.out',
+        overwrite: 'auto',
       });
     }
   };
@@ -476,10 +492,12 @@ export default function ProjectsSection() {
             >
               {/* EDITORIAL EXHIBITION CARD */}
               <div
+                onMouseEnter={(e) => handleMouseEnter(e, idx)}
                 onMouseMove={(e) => handleMouseMove(e, idx)}
                 onMouseLeave={() => handleMouseLeave(idx)}
                 style={{
                   transition: 'box-shadow 0.5s ease, background-color 0.5s ease, border-color 0.5s ease',
+                  willChange: 'transform',
                 }}
                 className={`group relative w-full rounded-2xl sm:rounded-3xl p-5 sm:p-7 border transition-all duration-500 overflow-hidden ${isActive
                   ? 'bg-[#ECE5DA] border-[#6F5A43]/50 shadow-card-hover'
@@ -488,7 +506,7 @@ export default function ProjectsSection() {
               >
                 {/* VIDEO EXHIBITION FRAME (Sleek Widescreen Ratio & Height Cap) */}
                 <div
-                  className="relative w-full aspect-[21/10] sm:aspect-[16/9] max-h-[340px] sm:max-h-[380px] rounded-xl sm:rounded-2xl overflow-hidden bg-[#171717] mb-5 sm:mb-6 border border-[#171717]/10 shadow-md group/video cursor-pointer"
+                  className="relative w-full aspect-[21/10] sm:aspect-[16/9] max-h-[340px] sm:max-h-[380px] rounded-xl sm:rounded-2xl overflow-hidden bg-[#171717] mb-5 sm:mb-6 border border-[#171717]/10 shadow-md group/video cursor-pointer will-change-transform"
                 >
                   <video
                     ref={(el) => (videoRefs.current[idx] = el)}
@@ -498,7 +516,7 @@ export default function ProjectsSection() {
                     loop
                     playsInline
                     preload="metadata"
-                    className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover/video:scale-[1.03]"
+                    className="w-full h-full object-cover object-top transition-transform duration-700 ease-out group-hover/video:scale-[1.03] will-change-transform"
                   />
 
                   {/* Subtle video ambient overlay gradient */}
@@ -562,13 +580,8 @@ export default function ProjectsSection() {
                     ))}
                   </div>
 
-                  {/* ACTION BUTTONS (Revealed smoothly on Active Focus Mode) */}
-                  <div
-                    className={`flex flex-wrap items-center gap-3 sm:gap-4 pt-3 transition-all duration-500 ease-out ${isActive
-                      ? 'opacity-100 translate-y-0 pointer-events-auto'
-                      : 'opacity-0 translate-y-4 pointer-events-none h-0 overflow-hidden pt-0'
-                      }`}
-                  >
+                  {/* ACTION BUTTONS (Always Visible & Interactive) */}
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-3 pointer-events-auto">
                     {/* Primary: Live Demo */}
                     <Magnetic strength={0.15}>
                       <a
@@ -658,12 +671,11 @@ export default function ProjectsSection() {
                       <video
                         ref={(el) => (archiveVideoRefs.current[archIdx] = el)}
                         src={archItem.video}
-                        autoPlay
                         loop
                         muted
                         playsInline
-                        preload="auto"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                        preload="metadata"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out will-change-transform"
                       />
                       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#171717]/20 via-transparent to-transparent opacity-60 group-hover:opacity-20 transition-opacity duration-500" />
                     </div>

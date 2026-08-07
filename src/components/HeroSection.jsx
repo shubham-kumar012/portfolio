@@ -22,31 +22,42 @@ export default function HeroSection() {
     const glowX = portraitGlowRef.current ? gsap.quickTo(portraitGlowRef.current, 'x', { duration: 0.5, ease: 'power3.out' }) : null;
     const glowY = portraitGlowRef.current ? gsap.quickTo(portraitGlowRef.current, 'y', { duration: 0.5, ease: 'power3.out' }) : null;
 
+    let rafId = null;
+
     const handleMouseMove = (e) => {
       const { clientX, clientY } = e;
-      const windowWidth = window.innerWidth;
-      const windowHeight = window.innerHeight;
+      if (rafId) return;
 
-      // Update CSS variables directly for spotlight glow background
-      document.documentElement.style.setProperty('--mouse-x', `${clientX}px`);
-      document.documentElement.style.setProperty('--mouse-y', `${clientY}px`);
+      rafId = requestAnimationFrame(() => {
+        rafId = null;
+        if (heroRef.current) {
+          heroRef.current.style.setProperty('--mouse-x', `${clientX}px`);
+          heroRef.current.style.setProperty('--mouse-y', `${clientY}px`);
+        }
 
-      // Normalized -1 to +1 range
-      const normX = (clientX / windowWidth) * 2 - 1;
-      const normY = (clientY / windowHeight) * 2 - 1;
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
 
-      bgTextX(normX * -15);
-      bgTextY(normY * -10);
-      portraitX(normX * 18);
-      portraitY(normY * 12);
-      if (glowX && glowY) {
-        glowX(normX * 30);
-        glowY(normY * 20);
-      }
+        // Normalized -1 to +1 range
+        const normX = (clientX / windowWidth) * 2 - 1;
+        const normY = (clientY / windowHeight) * 2 - 1;
+
+        bgTextX(normX * -15);
+        bgTextY(normY * -10);
+        portraitX(normX * 18);
+        portraitY(normY * 12);
+        if (glowX && glowY) {
+          glowX(normX * 30);
+          glowY(normY * 20);
+        }
+      });
     };
 
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, []);
 
   // Subtle 3D tilt effect on card hover based on cursor position

@@ -57,6 +57,7 @@ export default function ContactSection() {
   const buttonContainerRef = useRef(null);
   const drawerRef = useRef(null);
   const capsulesRef = useRef([]);
+  const capsuleRectsRef = useRef({});
   const hasStartedTyping = useRef(false);
 
   // Kinetic live writing sequence (preserves full letter layout, reveals character-by-character)
@@ -182,28 +183,35 @@ export default function ContactSection() {
     return () => ctx.revert();
   }, []);
 
-  // Handle capsule individual subtle 3D tilt on mousemove
+  // Handle capsule individual subtle 3D tilt on mousemove with cached rects
+  const handleCapsuleMouseEnter = (e, index) => {
+    const card = e.currentTarget;
+    capsuleRectsRef.current[index] = card.getBoundingClientRect();
+  };
+
   const handleCapsuleMouseMove = (e, index) => {
-    const card = capsulesRef.current[index];
+    const card = capsulesRef.current[index] || e.currentTarget;
     if (!card) return;
-    const rect = card.getBoundingClientRect();
+    const rect = capsuleRectsRef.current[index] || card.getBoundingClientRect();
     const cardX = e.clientX - rect.left - rect.width / 2;
     const cardY = e.clientY - rect.top - rect.height / 2;
 
-    const tiltX = (cardY / (rect.height / 2)) * -2.5;
-    const tiltY = (cardX / (rect.width / 2)) * 2.5;
+    const tiltX = (cardY / (rect.height / 2)) * -2.0;
+    const tiltY = (cardX / (rect.width / 2)) * 2.0;
 
     gsap.to(card, {
       rotateX: tiltX,
       rotateY: tiltY,
       transformPerspective: 800,
-      scale: 1.015,
+      scale: 1.012,
       duration: 0.25,
       ease: 'power2.out',
+      overwrite: 'auto',
     });
   };
 
   const handleCapsuleMouseLeave = (index) => {
+    delete capsuleRectsRef.current[index];
     const card = capsulesRef.current[index];
     if (!card) return;
     gsap.to(card, {
@@ -212,6 +220,7 @@ export default function ContactSection() {
       scale: 1,
       duration: 0.4,
       ease: 'power2.out',
+      overwrite: 'auto',
     });
   };
 
@@ -222,8 +231,24 @@ export default function ContactSection() {
     // Immediately complete writing if button clicked during animation
     setIsTypingFinished(true);
 
+    const drawer = drawerRef.current;
+    if (!drawer) return;
+
+    // Pre-calculate target height to prevent dynamic layout reflow thrashing
+    drawer.style.height = 'auto';
+    drawer.style.opacity = '1';
+    const targetHeight = drawer.scrollHeight;
+    drawer.style.height = '0px';
+    drawer.style.opacity = '0';
+
     const tl = gsap.timeline({
       onStart: () => setIsOpened(true),
+      onComplete: () => {
+        if (drawerRef.current) {
+          drawerRef.current.style.height = 'auto';
+        }
+        ScrollTrigger.refresh();
+      },
     });
 
     // Fade out button container
@@ -231,7 +256,7 @@ export default function ContactSection() {
       opacity: 0,
       y: -10,
       scale: 0.95,
-      duration: 0.5,
+      duration: 0.35,
       ease: 'power2.inOut',
       onComplete: () => {
         if (buttonContainerRef.current) {
@@ -239,43 +264,41 @@ export default function ContactSection() {
         }
       },
     })
-      // Lift letter gently upward & apply subtle elevation fold
+      // Lift letter gently upward
       .to(
         letterRef.current,
         {
-          y: -16,
+          y: -12,
           scale: 0.99,
-          rotateX: 2,
-          duration: 0.9,
-          ease: 'power3.inOut',
+          duration: 0.5,
+          ease: 'power2.out',
         },
-        '-=0.3'
+        '-=0.2'
       )
-      // Unfold / slide drawer upward smoothly from under the letter
-      .fromTo(
-        drawerRef.current,
-        { height: 0, opacity: 0, y: 40 },
+      // Unfold / slide drawer upward smoothly to target pixel height
+      .to(
+        drawer,
         {
-          height: 'auto',
+          height: targetHeight,
           opacity: 1,
           y: 0,
-          duration: 1.0,
-          ease: 'power3.inOut',
-        },
-        '-=0.7'
-      )
-      // Stagger contact capsules upward one after another
-      .fromTo(
-        capsulesRef.current,
-        { y: 35, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 0.8,
-          stagger: 0.12,
+          duration: 0.6,
           ease: 'power3.out',
         },
         '-=0.4'
+      )
+      // Stagger contact capsules upward smoothly
+      .fromTo(
+        capsulesRef.current,
+        { y: 25, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.5,
+          stagger: 0.08,
+          ease: 'power2.out',
+        },
+        '-=0.35'
       );
   };
 
@@ -543,6 +566,7 @@ export default function ContactSection() {
                   <div
                     key={capsule.id}
                     ref={(el) => (capsulesRef.current[index] = el)}
+                    onMouseEnter={(e) => handleCapsuleMouseEnter(e, index)}
                     onMouseMove={(e) => handleCapsuleMouseMove(e, index)}
                     onMouseLeave={() => handleCapsuleMouseLeave(index)}
                     onClick={(e) =>
